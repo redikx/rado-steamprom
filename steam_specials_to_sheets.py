@@ -222,9 +222,12 @@ def write_to_sheet(rows):
             "properties": {"pixelSize": 55},
             "fields": "pixelSize",
         }},
+        {"autoResizeDimensions": {"dimensions": {
+            "sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 5, "endIndex": 6
+        }}} if max((len(str(r[5])) for r in rows), default=0) <= 80 else
         {"updateDimensionProperties": {
             "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 5, "endIndex": 6},
-            "properties": {"pixelSize": 370},
+            "properties": {"pixelSize": 580},
             "fields": "pixelSize",
         }},
         {"repeatCell": {
