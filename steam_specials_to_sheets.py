@@ -110,8 +110,8 @@ def parse_rows(html, tag_map):
             rev_el.get("data-tooltip-html", "") if rev_el else ""
         )
 
-        out.append([name, discount, final_price, orig_price, tags_str,
-                    review_label, review_pct, appid, link])
+        out.append([name, discount, final_price, orig_price, link, tags_str,
+                    review_label, review_pct, appid])
     return out
 
 
@@ -182,8 +182,8 @@ def write_to_sheet(rows):
         ws = sh.add_worksheet(title="Promocje gier", rows=2000, cols=10)
 
     stamp = dt.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %Z")
-    header = ["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "Tagi",
-              "Opinie", "% pozytywnych", "AppID", "Link"]
+    header = ["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "Link",
+              "Tagi", "Opinie", "% pozytywnych", "AppID"]
     data = [
         [f"Ostatnia aktualizacja: {stamp} | prog: {MIN_DISCOUNT}% | region: {CC}",
          "", "", "", "", "", "", "", ""],
@@ -241,8 +241,8 @@ def write_to_sheet(rows):
 def write_csv(rows):
     with open("steam_specials.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "Tagi",
-                    "Opinie", "% pozytywnych", "AppID", "Link"])
+        w.writerow(["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "Link",
+                    "Tagi", "Opinie", "% pozytywnych", "AppID"])
         w.writerows(rows)
     print(f"Tryb lokalny: zapisano {len(rows)} gier -> steam_specials.csv")
 
