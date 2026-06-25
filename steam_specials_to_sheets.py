@@ -221,7 +221,7 @@ def write_to_sheet(rows):
                 "booleanRule": {
                     "condition": {
                         "type": "CUSTOM_FORMULA",
-                        "values": [{"userEnteredValue": "=$B3>90"}],
+                        "values": [{"userEnteredValue": "=$B3>89"}],
                     },
                     "format": {"backgroundColor": {"red": 1.0, "green": 0.6, "blue": 0.0}},
                 },
