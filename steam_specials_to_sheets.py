@@ -194,6 +194,10 @@ def write_to_sheet(rows):
     ws.update(values=data, range_name="A1")
 
     sh.batch_update({"requests": [
+        {"updateSheetProperties": {
+            "properties": {"sheetId": ws.id, "index": 0},
+            "fields": "index",
+        }},
         {"autoResizeDimensions": {"dimensions": {
             "sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 0, "endIndex": 1
         }}} if max((len(str(r[0])) for r in rows), default=0) <= 50 else
