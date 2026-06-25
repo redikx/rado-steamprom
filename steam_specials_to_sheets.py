@@ -188,7 +188,7 @@ def write_to_sheet(rows):
         [f"Ostatnia aktualizacja: {stamp} | prog: {MIN_DISCOUNT}% | region: {CC}",
          "", "", "", "", "", "", "", ""],
         header,
-    ] + [[r[0], r[1], r[2], r[3], f'=HYPERLINK("{r[4]}","Link")', r[5], r[6], r[7], r[8]]
+    ] + [[r[0], r[1], r[2], r[3], f'=HYPERLINK("{r[4]}";"Link")', r[5], r[6], r[7], r[8]]
          for r in rows]
 
     ws.clear()
