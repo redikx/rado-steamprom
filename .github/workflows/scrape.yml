@@ -2,8 +2,7 @@ name: Steam sales scraper
 
 on:
   schedule:
-    # Co 12 godzin: 00:00 i 12:00 UTC
-    - cron: "0 */12 * * *"
+    - cron: "0 */4 * * *"
   workflow_dispatch: {}
 
 jobs:
