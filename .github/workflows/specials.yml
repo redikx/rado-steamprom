@@ -1,0 +1,27 @@
+name: Steam specials scraper
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"   # co 12h; mozesz dac np. "0 */6 * * *" dla czestszych
+  workflow_dispatch: {}
+
+jobs:
+  specials:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 gspread google-auth
+
+      - name: Run specials scraper
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          MIN_DISCOUNT: "20"
+          CC: "PL"
+        run: python steam_specials_to_sheets.py
