@@ -197,6 +197,19 @@ def write_to_sheet(rows):
         {"autoResizeDimensions": {"dimensions": {
             "sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 0, "endIndex": 1
         }}},
+        {"repeatCell": {
+            "range": {"sheetId": ws.id, "startRowIndex": 1, "endRowIndex": 2},
+            "cell": {"userEnteredFormat": {
+                "horizontalAlignment": "CENTER",
+                "textFormat": {"bold": True},
+                "backgroundColor": {"red": 0.678, "green": 0.847, "blue": 0.902},
+                "borders": {"bottom": {
+                    "style": "SOLID_THICK",
+                    "color": {"red": 0.2, "green": 0.2, "blue": 0.2},
+                }},
+            }},
+            "fields": "userEnteredFormat(horizontalAlignment,textFormat,backgroundColor,borders)",
+        }},
         {"addConditionalFormatRule": {
             "rule": {
                 "ranges": [{"sheetId": ws.id, "startRowIndex": 2, "startColumnIndex": 0, "endColumnIndex": 9}],
