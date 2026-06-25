@@ -100,17 +100,21 @@ def scrape():
     for blob in collected:
         walk(blob, events)
 
+    now = int(dt.datetime.now(dt.timezone.utc).timestamp())
     rows, seen = [], set()
     for e in events:
         body = e.get("announcement_body") or {}
         name = e.get("event_name") or body.get("headline") or ""
-        end_unix = e.get("rtime32_end_time") or 0
+        end_unix = int(e.get("rtime32_end_time") or 0)
+        # pomijamy promocje, ktore juz sie zakonczyly
+        if 0 < end_unix < now:
+            continue
         gid = str(e.get("gid") or body.get("gid") or "")
         key = (name, gid)
         if key in seen:
             continue
         seen.add(key)
-        rows.append([name, to_local_iso(end_unix), int(end_unix or 0), build_link(e)])
+        rows.append([name, to_local_iso(end_unix), end_unix, build_link(e)])
 
     rows.sort(key=lambda r: r[2] or 0)
     return rows
