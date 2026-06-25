@@ -213,6 +213,11 @@ def write_to_sheet(rows):
             "fields": "userEnteredFormat.horizontalAlignment",
         }},
         {"updateDimensionProperties": {
+            "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 1, "endIndex": 2},
+            "properties": {"pixelSize": 80},
+            "fields": "pixelSize",
+        }},
+        {"updateDimensionProperties": {
             "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 4, "endIndex": 5},
             "properties": {"pixelSize": 55},
             "fields": "pixelSize",
