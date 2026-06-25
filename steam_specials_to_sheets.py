@@ -32,6 +32,7 @@ MIN_DISCOUNT = int(os.environ.get("MIN_DISCOUNT", "20"))
 CC = os.environ.get("CC", "PL")
 TAGS = os.environ.get("TAGS", "")
 MAX_PRICE = os.environ.get("MAX_PRICE", "")
+MAX_RESULTS = int(os.environ.get("MAX_RESULTS", "5000"))
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -95,9 +96,9 @@ def fetch_specials():
 
         for attempt in range(5):
             r = session.get(SEARCH_URL, params=params, timeout=30)
-            if r.status_code == 429:
+            if r.status_code in (429, 502, 503, 504):
                 wait = 10 * (2 ** attempt)
-                print(f"[rate limit] 429, czekam {wait}s (proba {attempt+1}/5)...")
+                print(f"[retry] {r.status_code}, czekam {wait}s (proba {attempt+1}/5)...")
                 time.sleep(wait)
                 continue
             r.raise_for_status()
@@ -112,9 +113,9 @@ def fetch_specials():
             html = data.get("results_html", "")
             rows.extend(parse_rows(html))
             start += count
-            if start >= total or not html.strip():
+            if start >= total or start >= MAX_RESULTS or not html.strip():
                 break
-            time.sleep(1.5)
+            time.sleep(2)
         except ValueError:
             print(f"[diag] status={r.status_code}, brak JSON; "
                   f"poczatek odpowiedzi: {r.text[:120]!r}")
