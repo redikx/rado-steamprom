@@ -196,7 +196,12 @@ def write_to_sheet(rows):
     sh.batch_update({"requests": [
         {"autoResizeDimensions": {"dimensions": {
             "sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 0, "endIndex": 1
-        }}},
+        }}} if max((len(str(r[0])) for r in rows), default=0) <= 50 else
+        {"updateDimensionProperties": {
+            "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 0, "endIndex": 1},
+            "properties": {"pixelSize": 370},
+            "fields": "pixelSize",
+        }},
         {"repeatCell": {
             "range": {"sheetId": ws.id, "startRowIndex": 1, "endRowIndex": 2},
             "cell": {"userEnteredFormat": {
