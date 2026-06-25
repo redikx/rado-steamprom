@@ -125,7 +125,6 @@ def write_to_sheet(rows):
 
     creds = json.loads(os.environ["GOOGLE_CREDENTIALS"])
     sheet_id = os.environ["SHEET_ID_SALES"]
-    print(f"[diag] SHEET_ID_SALES={sheet_id!r}")
     gc = gspread.service_account_from_dict(creds)
     sh = gc.open_by_key(sheet_id)
 
