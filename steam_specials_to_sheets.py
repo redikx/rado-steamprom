@@ -192,6 +192,11 @@ def write_to_sheet(rows):
 
     ws.clear()
     ws.update(values=data, range_name="A1")
+
+    sh.batch_update({"requests": [{"autoResizeDimensions": {"dimensions": {
+        "sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 0, "endIndex": 1
+    }}}]})
+
     print(f"Zapisano {len(rows)} gier (>= {MIN_DISCOUNT}%) do zakladki 'Promocje gier'.")
 
 
