@@ -14,7 +14,7 @@ Konfiguracja przez zmienne srodowiskowe:
   GOOGLE_CREDENTIALS - JSON konta serwisowego (ten sam co przy kampaniach)
   SHEET_ID           - ID tego samego arkusza
   MIN_DISCOUNT       - prog znizki w %, domyslnie 20
-  CC                 - region cenowy, domyslnie PL
+  CC                 - region cenowy, domyslnie DE
   TAGS               - opcjonalnie: ID tagow przez przecinek
   MAX_PRICE          - opcjonalnie: max cena (np. 20)
 
@@ -23,11 +23,14 @@ Tryb lokalny: bez GOOGLE_CREDENTIALS zapisuje steam_specials.csv.
 
 import os
 import csv
+import json
+import re
 import time
 import requests
 from bs4 import BeautifulSoup
 
 SEARCH_URL = "https://store.steampowered.com/search/results/"
+TAGS_URL = "https://store.steampowered.com/tagdata/populartags/english"
 MIN_DISCOUNT = int(os.environ.get("MIN_DISCOUNT", "20"))
 CC = os.environ.get("CC", "DE")
 TAGS = os.environ.get("TAGS", "")
@@ -43,7 +46,33 @@ HEADERS = {
 }
 
 
-def parse_rows(html):
+def fetch_tag_names():
+    """Pobiera slownik {tag_id: nazwa} ze Steam API (jeden request)."""
+    try:
+        r = requests.get(TAGS_URL, headers=HEADERS, timeout=15)
+        r.raise_for_status()
+        return {str(t["tagid"]): t["name"] for t in r.json()}
+    except Exception as e:
+        print(f"[tagi] Nie udalo sie pobrac nazw tagow: {e}")
+        return {}
+
+
+def parse_review(tooltip):
+    """Wyciaga (opis, procent) z tooltipa opinii."""
+    if not tooltip:
+        return "", ""
+    # "Overwhelmingly Positive<br>99% of the 12,340 user reviews..."
+    parts = tooltip.split("<br>")
+    label = parts[0].strip() if parts else ""
+    pct = ""
+    if len(parts) > 1:
+        m = re.search(r"(\d+)%", parts[1])
+        if m:
+            pct = int(m.group(1))
+    return label, pct
+
+
+def parse_rows(html, tag_map):
     """Wyciaga gry z fragmentu HTML wyszukiwarki, filtruje po znizce."""
     out = []
     soup = BeautifulSoup(html, "html.parser")
@@ -66,11 +95,27 @@ def parse_rows(html):
         orig_price = orig_el.get_text(strip=True) if orig_el else ""
         link = a.get("href", "").split("?")[0]
 
-        out.append([name, discount, final_price, orig_price, appid, link])
+        # tagi
+        try:
+            tag_ids = json.loads(a.get("data-ds-tagids", "[]"))
+            tags_str = ", ".join(
+                tag_map[str(tid)] for tid in tag_ids[:4] if str(tid) in tag_map
+            )
+        except (ValueError, TypeError):
+            tags_str = ""
+
+        # opinie
+        rev_el = a.select_one(".search_review_summary[data-tooltip-html]")
+        review_label, review_pct = parse_review(
+            rev_el.get("data-tooltip-html", "") if rev_el else ""
+        )
+
+        out.append([name, discount, final_price, orig_price, tags_str,
+                    review_label, review_pct, appid, link])
     return out
 
 
-def fetch_specials():
+def fetch_specials(tag_map):
     rows = []
     session = requests.Session()
     session.headers.update(HEADERS)
@@ -84,7 +129,7 @@ def fetch_specials():
             "dynamic_data": "",
             "sort_by": "Reviews_DESC",
             "specials": 1,
-            "category1": 998,   # tylko gry; usun, jesli chcesz tez DLC/soundtracki
+            "category1": 998,
             "infinite": 1,
             "cc": CC,
             "l": "english",
@@ -106,12 +151,11 @@ def fetch_specials():
         else:
             r.raise_for_status()
 
-        # Probujemy JSON (poprawna sciezka). Jak sie nie uda - fallback na HTML.
         try:
             data = r.json()
             total = data.get("total_count", 0)
             html = data.get("results_html", "")
-            rows.extend(parse_rows(html))
+            rows.extend(parse_rows(html, tag_map))
             start += count
             if start >= total or start >= MAX_RESULTS or not html.strip():
                 break
@@ -119,7 +163,7 @@ def fetch_specials():
         except ValueError:
             print(f"[diag] status={r.status_code}, brak JSON; "
                   f"poczatek odpowiedzi: {r.text[:120]!r}")
-            rows.extend(parse_rows(r.text))
+            rows.extend(parse_rows(r.text, tag_map))
             break
 
     rows.sort(key=lambda r: r[1], reverse=True)
@@ -127,7 +171,6 @@ def fetch_specials():
 
 
 def write_to_sheet(rows):
-    import json
     import datetime as dt
     import gspread
 
@@ -136,12 +179,14 @@ def write_to_sheet(rows):
     try:
         ws = sh.worksheet("Promocje gier")
     except gspread.WorksheetNotFound:
-        ws = sh.add_worksheet(title="Promocje gier", rows=2000, cols=8)
+        ws = sh.add_worksheet(title="Promocje gier", rows=2000, cols=10)
 
     stamp = dt.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %Z")
-    header = ["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "AppID", "Link"]
+    header = ["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "Tagi",
+              "Opinie", "% pozytywnych", "AppID", "Link"]
     data = [
-        [f"Ostatnia aktualizacja: {stamp} | prog: {MIN_DISCOUNT}% | region: {CC}", "", "", "", "", ""],
+        [f"Ostatnia aktualizacja: {stamp} | prog: {MIN_DISCOUNT}% | region: {CC}",
+         "", "", "", "", "", "", "", ""],
         header,
     ] + rows
 
@@ -153,13 +198,18 @@ def write_to_sheet(rows):
 def write_csv(rows):
     with open("steam_specials.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "AppID", "Link"])
+        w.writerow(["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "Tagi",
+                    "Opinie", "% pozytywnych", "AppID", "Link"])
         w.writerows(rows)
     print(f"Tryb lokalny: zapisano {len(rows)} gier -> steam_specials.csv")
 
 
 def main():
-    rows = fetch_specials()
+    print("Pobieranie nazw tagow Steam...")
+    tag_map = fetch_tag_names()
+    print(f"Zaladowano {len(tag_map)} tagow.")
+
+    rows = fetch_specials(tag_map)
     print(f"Znaleziono {len(rows)} gier ze znizka >= {MIN_DISCOUNT}%.")
     if not rows:
         print("UWAGA: brak wynikow. Sprawdz diagnostyke wyzej lub parametry.")
