@@ -94,8 +94,17 @@ def fetch_specials():
         if MAX_PRICE:
             params["maxprice"] = MAX_PRICE
 
-        r = session.get(SEARCH_URL, params=params, timeout=30)
-        r.raise_for_status()
+        for attempt in range(5):
+            r = session.get(SEARCH_URL, params=params, timeout=30)
+            if r.status_code == 429:
+                wait = 10 * (2 ** attempt)
+                print(f"[rate limit] 429, czekam {wait}s (proba {attempt+1}/5)...")
+                time.sleep(wait)
+                continue
+            r.raise_for_status()
+            break
+        else:
+            r.raise_for_status()
 
         # Probujemy JSON (poprawna sciezka). Jak sie nie uda - fallback na HTML.
         try:
@@ -106,7 +115,7 @@ def fetch_specials():
             start += count
             if start >= total or not html.strip():
                 break
-            time.sleep(0.5)
+            time.sleep(1.5)
         except ValueError:
             print(f"[diag] status={r.status_code}, brak JSON; "
                   f"poczatek odpowiedzi: {r.text[:120]!r}")
