@@ -116,7 +116,7 @@ def scrape():
         seen.add(key)
         rows.append([name, to_local_iso(end_unix), end_unix, build_link(e)])
 
-    rows.sort(key=lambda r: r[2] or 0)
+    rows.sort(key=lambda r: (r[2] == 0, r[2]))
     return rows
 
 
