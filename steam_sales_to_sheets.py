@@ -125,7 +125,6 @@ def write_to_sheet(rows):
 
     creds = json.loads(os.environ["GOOGLE_CREDENTIALS"])
     sheet_id = os.environ["SHEET_ID_SALES"]
-    print(f"[diag] using sheet_id: {sheet_id[:6]}...{sheet_id[-4:]}")
     gc = gspread.service_account_from_dict(creds)
     sh = gc.open_by_key(sheet_id)
 
@@ -155,7 +154,7 @@ def main():
     rows = scrape()
     if not rows:
         print("UWAGA: nie znaleziono zadnych kampanii. Sprawdz strukture odpowiedzi Steama.")
-    if os.environ.get("GOOGLE_CREDENTIALS") and os.environ.get("SHEET_ID"):
+    if os.environ.get("GOOGLE_CREDENTIALS") and os.environ.get("SHEET_ID_SALES"):
         write_to_sheet(rows)
     else:
         write_csv(rows)
