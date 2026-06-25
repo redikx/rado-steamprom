@@ -2,7 +2,7 @@ name: Steam specials scraper
 
 on:
   schedule:
-    - cron: "0 */12 * * *"   # co 12h; mozesz dac np. "0 */6 * * *" dla czestszych
+    - cron: "0 */4 * * *"
   workflow_dispatch: {}
 
 jobs:
@@ -23,5 +23,5 @@ jobs:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
           SHEET_ID: ${{ secrets.SHEET_ID }}
           MIN_DISCOUNT: "20"
-          CC: "PL"
+          CC: "DE"
         run: python steam_specials_to_sheets.py
