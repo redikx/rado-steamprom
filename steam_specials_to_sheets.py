@@ -193,9 +193,24 @@ def write_to_sheet(rows):
     ws.clear()
     ws.update(values=data, range_name="A1")
 
-    sh.batch_update({"requests": [{"autoResizeDimensions": {"dimensions": {
-        "sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 0, "endIndex": 1
-    }}}]})
+    sh.batch_update({"requests": [
+        {"autoResizeDimensions": {"dimensions": {
+            "sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 0, "endIndex": 1
+        }}},
+        {"addConditionalFormatRule": {
+            "rule": {
+                "ranges": [{"sheetId": ws.id, "startRowIndex": 2, "startColumnIndex": 0, "endColumnIndex": 9}],
+                "booleanRule": {
+                    "condition": {
+                        "type": "CUSTOM_FORMULA",
+                        "values": [{"userEnteredValue": "=$B3>90"}],
+                    },
+                    "format": {"backgroundColor": {"red": 1.0, "green": 0.6, "blue": 0.0}},
+                },
+            },
+            "index": 0,
+        }},
+    ]})
 
     print(f"Zapisano {len(rows)} gier (>= {MIN_DISCOUNT}%) do zakladki 'Promocje gier'.")
 
