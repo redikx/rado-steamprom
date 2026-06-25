@@ -217,6 +217,11 @@ def write_to_sheet(rows):
             "properties": {"pixelSize": 55},
             "fields": "pixelSize",
         }},
+        {"updateDimensionProperties": {
+            "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 5, "endIndex": 6},
+            "properties": {"pixelSize": 370},
+            "fields": "pixelSize",
+        }},
         {"repeatCell": {
             "range": {"sheetId": ws.id, "startRowIndex": 1, "endRowIndex": 2},
             "cell": {"userEnteredFormat": {
