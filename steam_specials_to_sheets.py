@@ -184,14 +184,15 @@ def write_to_sheet(rows):
     stamp = dt.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %Z")
     header = ["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "Link",
               "Tagi", "Opinie", "% pozytywnych", "AppID"]
-    data = [
+    sheet_rows = [
         [f"Ostatnia aktualizacja: {stamp} | prog: {MIN_DISCOUNT}% | region: {CC}",
          "", "", "", "", "", "", "", ""],
         header,
-    ] + rows
+    ] + [[r[0], r[1], r[2], r[3], f'=HYPERLINK("{r[4]}","Link")', r[5], r[6], r[7], r[8]]
+         for r in rows]
 
     ws.clear()
-    ws.update(values=data, range_name="A1")
+    ws.update(values=sheet_rows, range_name="A1", value_input_option="USER_ENTERED")
 
     sh.batch_update({"requests": [
         {"updateSheetProperties": {
@@ -207,9 +208,14 @@ def write_to_sheet(rows):
             "fields": "pixelSize",
         }},
         {"repeatCell": {
-            "range": {"sheetId": ws.id, "startRowIndex": 2, "startColumnIndex": 1, "endColumnIndex": 4},
+            "range": {"sheetId": ws.id, "startRowIndex": 2, "startColumnIndex": 1, "endColumnIndex": 5},
             "cell": {"userEnteredFormat": {"horizontalAlignment": "CENTER"}},
             "fields": "userEnteredFormat.horizontalAlignment",
+        }},
+        {"updateDimensionProperties": {
+            "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 4, "endIndex": 5},
+            "properties": {"pixelSize": 55},
+            "fields": "pixelSize",
         }},
         {"repeatCell": {
             "range": {"sheetId": ws.id, "startRowIndex": 1, "endRowIndex": 2},
