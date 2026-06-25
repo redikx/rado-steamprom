@@ -58,10 +58,11 @@ def to_local_iso(ts):
         ts = int(ts)
         if ts <= 0:
             return ""
+        cest = dt.timezone(dt.timedelta(hours=2))
         return (
             dt.datetime.fromtimestamp(ts, dt.timezone.utc)
-            .astimezone()
-            .strftime("%Y-%m-%d %H:%M %Z")
+            .astimezone(cest)
+            .strftime("%Y-%m-%d %H:%M CEST")
         )
     except Exception:
         return ""
@@ -133,7 +134,8 @@ def write_to_sheet(rows):
     except gspread.WorksheetNotFound:
         ws = sh.add_worksheet(title="Steam Sales", rows=200, cols=6)
 
-    stamp = dt.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %Z")
+    cest = dt.timezone(dt.timedelta(hours=2))
+    stamp = dt.datetime.now(tz=cest).strftime("%Y-%m-%d %H:%M CEST")
     header = ["Nazwa kampanii", "Czas zakonczenia", "Koniec (unix)", "Link"]
     data = [[f"Ostatnia aktualizacja: {stamp}", "", "", ""], header] + rows
 
