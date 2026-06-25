@@ -51,11 +51,10 @@ def parse_rows(html):
         name_el = a.select_one(".title")
         name = name_el.get_text(strip=True) if name_el else ""
 
-        disc_el = a.select_one(".search_discount span")
-        disc_txt = disc_el.get_text(strip=True) if disc_el else ""  # np. "-50%"
+        disc_block = a.select_one(".discount_block[data-discount]")
         try:
-            discount = int(disc_txt.replace("-", "").replace("%", ""))
-        except ValueError:
+            discount = int(disc_block["data-discount"]) if disc_block else 0
+        except (ValueError, TypeError):
             discount = 0
         if discount < MIN_DISCOUNT:
             continue
