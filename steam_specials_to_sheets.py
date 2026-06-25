@@ -29,7 +29,7 @@ from bs4 import BeautifulSoup
 
 SEARCH_URL = "https://store.steampowered.com/search/results/"
 MIN_DISCOUNT = int(os.environ.get("MIN_DISCOUNT", "20"))
-CC = os.environ.get("CC", "PL")
+CC = os.environ.get("CC", "DE")
 TAGS = os.environ.get("TAGS", "")
 MAX_PRICE = os.environ.get("MAX_PRICE", "")
 MAX_RESULTS = int(os.environ.get("MAX_RESULTS", "5000"))
