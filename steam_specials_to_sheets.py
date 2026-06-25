@@ -181,7 +181,8 @@ def write_to_sheet(rows):
     except gspread.WorksheetNotFound:
         ws = sh.add_worksheet(title="Promocje gier", rows=2000, cols=10)
 
-    stamp = dt.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %Z")
+    cest = dt.timezone(dt.timedelta(hours=2))
+    stamp = dt.datetime.now(tz=cest).strftime("%Y-%m-%d %H:%M CEST")
     header = ["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "Link",
               "Tagi", "Opinie", "% pozytywnych", "AppID"]
     sheet_rows = [
