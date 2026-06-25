@@ -203,6 +203,11 @@ def write_to_sheet(rows):
             "fields": "pixelSize",
         }},
         {"repeatCell": {
+            "range": {"sheetId": ws.id, "startRowIndex": 2, "startColumnIndex": 1, "endColumnIndex": 4},
+            "cell": {"userEnteredFormat": {"horizontalAlignment": "CENTER"}},
+            "fields": "userEnteredFormat.horizontalAlignment",
+        }},
+        {"repeatCell": {
             "range": {"sheetId": ws.id, "startRowIndex": 1, "endRowIndex": 2},
             "cell": {"userEnteredFormat": {
                 "horizontalAlignment": "CENTER",
