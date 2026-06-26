@@ -42,6 +42,7 @@ if 'IF_IN_LIBRARY' in promo_header:
     lib_col_idx = promo_header.index('IF_IN_LIBRARY') + 1  # 1-indexed
 else:
     lib_col_idx = len(promo_header) + 1
+    promo_sheet.resize(cols=lib_col_idx)
     promo_sheet.update_cell(header_row_idx + 1, lib_col_idx, 'IF_IN_LIBRARY')
 
 # ── Sprawdź każdy wiersz ────────────────────────────────────────────────────
