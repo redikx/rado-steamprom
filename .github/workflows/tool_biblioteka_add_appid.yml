@@ -1,4 +1,4 @@
-name: Tool: Biblioteka - dodaj AppID
+name: "Tool: Biblioteka - dodaj AppID"
 
 on:
   workflow_dispatch: {}
