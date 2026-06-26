@@ -25,4 +25,4 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
           SHEET_ID_SALES: ${{ secrets.SHEET_ID_SALES }}
-        run: python steam_sales_to_sheets.py
+        run: python steam_akcje_promocyjne_load.py

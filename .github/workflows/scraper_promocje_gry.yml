@@ -24,4 +24,4 @@ jobs:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           MIN_DISCOUNT: "20"
           CC: "DE"
-        run: python steam_specials_to_sheets.py
+        run: python steam_promocje_gry_load.py
