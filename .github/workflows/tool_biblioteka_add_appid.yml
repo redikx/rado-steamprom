@@ -1,0 +1,25 @@
+name: Tool: Biblioteka - dodaj AppID
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  enrich:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests gspread google-auth
+
+      - name: Dodaj AppID do arkusza Moja biblioteka steam
+        env:
+          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+          STEAM_ID: ${{ secrets.STEAM_ID }}
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          SHEET_ID_LIBRARY: "1kP_2TrXq34vfMdKLstEgBbmBlnXidRTKFwOIoWrBiaY"
+        run: python steam_biblioteka_enrichment_appid.py
