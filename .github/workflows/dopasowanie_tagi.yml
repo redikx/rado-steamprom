@@ -1,0 +1,28 @@
+name: "Dopasowanie: enrichment tagów"
+
+on:
+  workflow_run:
+    workflows: ["Steam specials scraper"]
+    types:
+      - completed
+  workflow_dispatch: {}
+
+jobs:
+  enrich:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 gspread google-auth
+
+      - name: Enrich Dopasowanie tags
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          SHEET_ID_WISHLIST: "1CWHtGUf7Zeg0LVel-lkwEKf9V10czQuYIQ9BKeNt16A"
+        run: python steam_dopasowanie_tagi.py
