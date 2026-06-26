@@ -20,8 +20,17 @@ Tryb lokalny (test):
 import os
 import csv
 import json
+import re
 import datetime as dt
 from playwright.sync_api import sync_playwright
+
+EMOJI_RE = re.compile(
+    "[\U0001F300-\U0001FAFF\U00002300-\U000027BF\U0000FE00-\U0000FE0F\U0001F1E0-\U0001F1FF]+",
+    flags=re.UNICODE
+)
+
+def strip_emoji(text):
+    return re.sub(r"\s+", " ", EMOJI_RE.sub("", text)).strip()
 
 URL = "https://store.steampowered.com/news/collection/sales/"
 
@@ -105,7 +114,7 @@ def scrape():
     rows, seen = [], set()
     for e in events:
         body = e.get("announcement_body") or {}
-        name = e.get("event_name") or body.get("headline") or ""
+        name = strip_emoji(e.get("event_name") or body.get("headline") or "")
         end_unix = int(e.get("rtime32_end_time") or 0)
         # pomijamy promocje, ktore juz sie zakonczyly
         if 0 < end_unix < now:
