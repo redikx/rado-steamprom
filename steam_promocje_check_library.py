@@ -37,13 +37,13 @@ data_start_row = header_row_idx + 2  # 1-indexed w arkuszu
 
 appid_promo_col = promo_header.index('AppID')
 
-# znajdź lub utwórz kolumnę IF_IN_LIBRARY
-if 'IF_IN_LIBRARY' in promo_header:
-    lib_col_idx = promo_header.index('IF_IN_LIBRARY') + 1  # 1-indexed
+# znajdź lub utwórz kolumnę HAVE
+if 'HAVE' in promo_header:
+    lib_col_idx = promo_header.index('HAVE') + 1  # 1-indexed
 else:
     lib_col_idx = len(promo_header) + 1
     promo_sheet.resize(cols=lib_col_idx)
-    promo_sheet.update_cell(header_row_idx + 1, lib_col_idx, 'IF_IN_LIBRARY')
+    promo_sheet.update_cell(header_row_idx + 1, lib_col_idx, 'HAVE')
 
 # ── Sprawdź każdy wiersz ────────────────────────────────────────────────────
 batch_updates = []
@@ -69,5 +69,20 @@ for i, row in enumerate(data_rows):
 
 if batch_updates:
     promo_sheet.batch_update(batch_updates)
+
+col_idx_0 = lib_col_idx - 1  # 0-indexed
+sheet_id = promo_sheet.id
+promo_sheet.spreadsheet.batch_update({"requests": [
+    {"updateDimensionProperties": {
+        "range": {"sheetId": sheet_id, "dimension": "COLUMNS", "startIndex": col_idx_0, "endIndex": col_idx_0 + 1},
+        "properties": {"pixelSize": 6 * 7 + 20},
+        "fields": "pixelSize"
+    }},
+    {"repeatCell": {
+        "range": {"sheetId": sheet_id, "startColumnIndex": col_idx_0, "endColumnIndex": col_idx_0 + 1},
+        "cell": {"userEnteredFormat": {"horizontalAlignment": "CENTER"}},
+        "fields": "userEnteredFormat.horizontalAlignment"
+    }}
+]})
 
 print(f"Zaktualizowano {len(batch_updates)} wierszy: {y_count} w bibliotece (Y), {n_count} brak (N).")
