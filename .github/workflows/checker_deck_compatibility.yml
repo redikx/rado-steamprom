@@ -1,0 +1,28 @@
+name: "Checker: Steam Deck compatibility"
+
+on:
+  workflow_run:
+    workflows: ["Checker: Promocje vs Biblioteka"]
+    types:
+      - completed
+
+jobs:
+  check:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install gspread google-auth requests
+
+      - name: "Sprawdź Steam Deck compatibility"
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          SHEET_ID_PROMOCJE: "1NHKBx5nAoUnfuNk3PNXJKhoaCtcrQqwFHdGN4kHT0Wk"
+          SHEET_ID_WISHLIST: "1CWHtGUf7Zeg0LVel-lkwEKf9V10czQuYIQ9BKeNt16A"
+        run: python steam_promocje_deck_check.py
