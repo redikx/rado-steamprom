@@ -104,6 +104,10 @@ def parse_rows(html, tag_map):
         except (ValueError, TypeError):
             tags_str = ""
 
+        # data wydania
+        released_el = a.select_one(".search_released")
+        release_date = released_el.get_text(strip=True) if released_el else ""
+
         # opinie
         rev_el = a.select_one(".search_review_summary[data-tooltip-html]")
         review_label, review_pct = parse_review(
@@ -111,7 +115,7 @@ def parse_rows(html, tag_map):
         )
 
         out.append([name, discount, final_price, orig_price, link, tags_str,
-                    review_label, review_pct, appid])
+                    release_date, review_label, review_pct, appid])
     return out
 
 
@@ -179,17 +183,17 @@ def write_to_sheet(rows):
     try:
         ws = sh.worksheet("Promocje gier")
     except gspread.WorksheetNotFound:
-        ws = sh.add_worksheet(title="Promocje gier", rows=2000, cols=10)
+        ws = sh.add_worksheet(title="Promocje gier", rows=2000, cols=11)
 
     cest = dt.timezone(dt.timedelta(hours=2))
     stamp = dt.datetime.now(tz=cest).strftime("%Y-%m-%d %H:%M CEST")
     header = ["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "Link",
-              "Tagi", "Opinie", "% pozytywnych", "AppID"]
+              "Tagi", "Data wydania", "Opinie", "% pozytywnych", "AppID"]
     sheet_rows = [
         [f"Ostatnia aktualizacja: {stamp} | prog: {MIN_DISCOUNT}% | region: {CC}",
-         "", "", "", "", "", "", "", ""],
+         "", "", "", "", "", "", "", "", ""],
         header,
-    ] + [[r[0], r[1], r[2], r[3], f'=HYPERLINK("{r[4]}";"Link")', r[5], r[6], r[7], r[8]]
+    ] + [[r[0], r[1], r[2], r[3], f'=HYPERLINK("{r[4]}";"Link")', r[5], r[6], r[7], r[8], r[9]]
          for r in rows]
 
     ws.clear()
@@ -214,12 +218,12 @@ def write_to_sheet(rows):
             "fields": "userEnteredFormat.horizontalAlignment",
         }},
         {"repeatCell": {
-            "range": {"sheetId": ws.id, "startRowIndex": 2, "startColumnIndex": 8, "endColumnIndex": 9},
+            "range": {"sheetId": ws.id, "startRowIndex": 2, "startColumnIndex": 9, "endColumnIndex": 10},
             "cell": {"userEnteredFormat": {"horizontalAlignment": "CENTER"}},
             "fields": "userEnteredFormat.horizontalAlignment",
         }},
         {"updateDimensionProperties": {
-            "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 8, "endIndex": 9},
+            "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 9, "endIndex": 10},
             "properties": {"pixelSize": 104},
             "fields": "pixelSize",
         }},
@@ -256,7 +260,7 @@ def write_to_sheet(rows):
         }},
         {"addConditionalFormatRule": {
             "rule": {
-                "ranges": [{"sheetId": ws.id, "startRowIndex": 2, "startColumnIndex": 0, "endColumnIndex": 9}],
+                "ranges": [{"sheetId": ws.id, "startRowIndex": 2, "startColumnIndex": 0, "endColumnIndex": 10}],
                 "booleanRule": {
                     "condition": {
                         "type": "CUSTOM_FORMULA",
@@ -276,7 +280,7 @@ def write_csv(rows):
     with open("steam_specials.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "Link",
-                    "Tagi", "Opinie", "% pozytywnych", "AppID"])
+                    "Tagi", "Data wydania", "Opinie", "% pozytywnych", "AppID"])
         w.writerows(rows)
     print(f"Tryb lokalny: zapisano {len(rows)} gier -> steam_specials.csv")
 
