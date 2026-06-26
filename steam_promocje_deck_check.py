@@ -32,7 +32,7 @@ def get_deck(appid):
     try:
         r = requests.get(
             "https://store.steampowered.com/api/appdetails",
-            params={"appids": appid, "filters": "steam_deck_compatibility", "l": "english"},
+            params={"appids": appid, "l": "english"},
             headers=HEADERS,
             timeout=15
         )
@@ -40,22 +40,26 @@ def get_deck(appid):
         app = r.json().get(str(appid), {})
         if not app.get('success'):
             if not _debug_done:
-                print(f"  DEBUG [{appid}] success=False")
+                print(f"  DEBUG [{appid}] success=False, app_keys={list(app.keys())}")
                 _debug_done = True
             return 'U'
         data = app.get('data') or {}
         if not isinstance(data, dict):
+            if not _debug_done:
+                print(f"  DEBUG [{appid}] data is {type(data).__name__}")
+                _debug_done = True
             return 'U'
+        if not _debug_done:
+            deck_val = data.get('steam_deck_compatibility')
+            deck_keys = [k for k in data.keys() if 'deck' in k.lower() or 'compat' in k.lower()]
+            print(f"  DEBUG [{appid}] data_keys_count={len(data)} deck_val_type={type(deck_val).__name__} deck_related_keys={deck_keys}")
+            _debug_done = True
         deck = data.get('steam_deck_compatibility') or {}
-        # API zwraca listę lub dict zależnie od kontekstu
         if isinstance(deck, list):
             deck = deck[0] if deck else {}
         if not isinstance(deck, dict):
             return 'U'
         category = deck.get('category', 0)
-        if not _debug_done:
-            print(f"  DEBUG [{appid}] deck_type={type(data.get('steam_deck_compatibility')).__name__} category={category}")
-            _debug_done = True
         return DECK_MAP.get(category, 'U')
     except Exception as e:
         print(f"  Błąd API dla {appid}: {e}")
