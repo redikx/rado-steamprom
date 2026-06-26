@@ -137,4 +137,30 @@ if appid_updates:
 if tag_updates:
     ws.batch_update(tag_updates)
 
+# ── Formatowanie ───────────────────────────────────────────────────────────
+sid = ws.id
+wb.batch_update({"requests": [
+    # Nagłówek wiersz 1: bold + centrowanie
+    {"repeatCell": {
+        "range": {"sheetId": sid, "startRowIndex": 0, "endRowIndex": 1},
+        "cell": {"userEnteredFormat": {
+            "textFormat": {"bold": True},
+            "horizontalAlignment": "CENTER",
+        }},
+        "fields": "userEnteredFormat(textFormat,horizontalAlignment)",
+    }},
+    # Kolumna B (AppID): szerokość 104px
+    {"updateDimensionProperties": {
+        "range": {"sheetId": sid, "dimension": "COLUMNS", "startIndex": 1, "endIndex": 2},
+        "properties": {"pixelSize": 104},
+        "fields": "pixelSize",
+    }},
+    # Kolumna B (AppID): centrowanie danych
+    {"repeatCell": {
+        "range": {"sheetId": sid, "startRowIndex": 1, "startColumnIndex": 1, "endColumnIndex": 2},
+        "cell": {"userEnteredFormat": {"horizontalAlignment": "CENTER"}},
+        "fields": "userEnteredFormat(horizontalAlignment)",
+    }},
+]})
+
 print(f"\nGotowe: zaktualizowano {len(tag_updates)} gier w zakładce Dopasowanie.")
