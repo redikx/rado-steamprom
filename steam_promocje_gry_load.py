@@ -193,7 +193,7 @@ def write_to_sheet(rows):
 
     cest = dt.timezone(dt.timedelta(hours=2))
     stamp = dt.datetime.now(tz=cest).strftime("%Y-%m-%d %H:%M CEST")
-    header = ["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "Link",
+    header = ["Nazwa", "Znizka %", "Cena", "Base price", "Link",
               "Tagi", "Released", "Opinie", "% pozytywnych", "AppID"]
     sheet_rows = [
         [f"Ostatnia aktualizacja: {stamp} | prog: {MIN_DISCOUNT}% | region: {CC}",
@@ -235,6 +235,11 @@ def write_to_sheet(rows):
         }},
         {"updateDimensionProperties": {
             "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 1, "endIndex": 2},
+            "properties": {"pixelSize": 80},
+            "fields": "pixelSize",
+        }},
+        {"updateDimensionProperties": {
+            "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 2, "endIndex": 4},
             "properties": {"pixelSize": 80},
             "fields": "pixelSize",
         }},
@@ -290,7 +295,7 @@ def write_to_sheet(rows):
 def write_csv(rows):
     with open("steam_specials.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "Link",
+        w.writerow(["Nazwa", "Znizka %", "Cena", "Base price", "Link",
                     "Tagi", "Released", "Opinie", "% pozytywnych", "AppID"])
         w.writerows(rows)
     print(f"Tryb lokalny: zapisano {len(rows)} gier -> steam_specials.csv")
