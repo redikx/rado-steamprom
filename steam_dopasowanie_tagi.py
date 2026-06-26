@@ -47,29 +47,29 @@ def clean_name(name):
 def search_appid(name):
     clean = clean_name(name)
     r = requests.get(
-        "https://store.steampowered.com/search/results/",
-        params={"query": clean, "start": 0, "count": 10, "infinite": 1, "l": "english"},
-        headers={**HEADERS, "X-Requested-With": "XMLHttpRequest", "Accept": "application/json"},
+        "https://store.steampowered.com/search/suggest",
+        params={"term": clean, "f": "games", "cc": "DE", "l": "english"},
+        headers=HEADERS,
         timeout=15,
     )
     r.raise_for_status()
-    html = r.json().get("results_html", "")
-    soup = BeautifulSoup(html, "html.parser")
-
+    soup = BeautifulSoup(r.text, "html.parser")
     clean_lower = clean.lower()
-    for a in soup.select("a.search_result_row"):
-        title_el = a.select_one(".title")
-        if not title_el:
+
+    for item in soup.select("a"):
+        appid = item.get("data-ds-appid", "")
+        title_el = item.select_one(".match_name")
+        if not appid or not title_el:
             continue
         found = clean_name(title_el.get_text(strip=True)).lower()
         if found == clean_lower:
-            return a.get("data-ds-appid", "")
+            return appid
 
     # fallback: pierwszy wynik
-    first = soup.select_one("a.search_result_row")
+    first = soup.select_one("a[data-ds-appid]")
     if first:
         appid = first.get("data-ds-appid", "")
-        title = first.select_one(".title")
+        title = first.select_one(".match_name")
         print(f"    [fallback] '{clean}' -> '{title.get_text(strip=True) if title else '?'}' ({appid})")
         return appid
     return ""
