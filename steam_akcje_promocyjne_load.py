@@ -127,7 +127,7 @@ def scrape():
         rows.append([name, to_local_iso(end_unix), end_unix, build_link(e)])
 
     rows.sort(key=lambda r: (r[2] == 0, r[2]))
-    return [[r[0], r[1], f'=HYPERLINK("{r[3]}","Link")' if r[3] else ""] for r in rows]
+    return [[r[0], r[1], f'=HYPERLINK("{r[3]}";"Link")' if r[3] else ""] for r in rows]
 
 
 def write_to_sheet(rows):
