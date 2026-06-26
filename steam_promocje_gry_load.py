@@ -213,6 +213,16 @@ def write_to_sheet(rows):
             "cell": {"userEnteredFormat": {"horizontalAlignment": "CENTER"}},
             "fields": "userEnteredFormat.horizontalAlignment",
         }},
+        {"repeatCell": {
+            "range": {"sheetId": ws.id, "startRowIndex": 2, "startColumnIndex": 8, "endColumnIndex": 9},
+            "cell": {"userEnteredFormat": {"horizontalAlignment": "CENTER"}},
+            "fields": "userEnteredFormat.horizontalAlignment",
+        }},
+        {"updateDimensionProperties": {
+            "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 8, "endIndex": 9},
+            "properties": {"pixelSize": 104},
+            "fields": "pixelSize",
+        }},
         {"updateDimensionProperties": {
             "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 1, "endIndex": 2},
             "properties": {"pixelSize": 80},
