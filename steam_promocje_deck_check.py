@@ -32,26 +32,30 @@ def get_deck(appid):
     try:
         r = requests.get(
             "https://store.steampowered.com/api/appdetails",
-            params={"appids": appid, "l": "english"},
+            params={"appids": appid, "filters": "steam_deck_compatibility", "l": "english"},
             headers=HEADERS,
             timeout=15
         )
         r.raise_for_status()
         app = r.json().get(str(appid), {})
         if not app.get('success'):
+            if not _debug_done:
+                print(f"  DEBUG [{appid}] success=False")
+                _debug_done = True
             return 'U'
         data = app.get('data') or {}
         if not isinstance(data, dict):
             return 'U'
         deck = data.get('steam_deck_compatibility') or {}
+        # API zwraca listę lub dict zależnie od kontekstu
         if isinstance(deck, list):
             deck = deck[0] if deck else {}
         if not isinstance(deck, dict):
             return 'U'
-        if not _debug_done:
-            print(f"  DEBUG deck fields: {deck}")
-            _debug_done = True
         category = deck.get('category', 0)
+        if not _debug_done:
+            print(f"  DEBUG [{appid}] deck_type={type(data.get('steam_deck_compatibility')).__name__} category={category}")
+            _debug_done = True
         return DECK_MAP.get(category, 'U')
     except Exception as e:
         print(f"  Błąd API dla {appid}: {e}")
@@ -162,6 +166,8 @@ if promo_updates:
 
 # ── Formatowanie DECK w Steam-promocje ─────────────────────────────────────
 col_0 = deck_promo_col_1 - 1
+# resize zawsze — updateDimensionProperties nie zadziała jeśli kolumna jest poza siatką
+promo_ws.resize(cols=deck_promo_col_1)
 promo_ws.spreadsheet.batch_update({"requests": [
     {"updateDimensionProperties": {
         "range": {"sheetId": promo_ws.id, "dimension": "COLUMNS",
