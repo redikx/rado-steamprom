@@ -1,4 +1,4 @@
-name: Steam sales scraper
+name: Steam akcje promocyjne scraper
 
 on:
   schedule:
