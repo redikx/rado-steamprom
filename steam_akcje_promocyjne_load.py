@@ -141,6 +141,17 @@ def write_to_sheet(rows):
 
     ws.clear()
     ws.update(values=data, range_name="A1")
+
+    max_len = max((len(r[0]) for r in rows if r), default=20)
+    col_a_px = min(max_len, 50) * 7 + 20
+    sh.batch_update({"requests": [
+        {"updateDimensionProperties": {
+            "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 0, "endIndex": 1},
+            "properties": {"pixelSize": col_a_px},
+            "fields": "pixelSize"
+        }}
+    ]})
+
     print(f"Zapisano {len(rows)} kampanii do arkusza (zakladka 'Steam Sales').")
 
 
