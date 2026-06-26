@@ -30,36 +30,22 @@ _debug_done = False
 def get_deck(appid):
     global _debug_done
     try:
+        # Dedykowany endpoint Steam dla Deck compatibility
         r = requests.get(
-            "https://store.steampowered.com/api/appdetails",
-            params={"appids": appid, "l": "english"},
+            "https://store.steampowered.com/saleaction/ajaxgetdeckappcompatibilityreport",
+            params={"nAppID": appid},
             headers=HEADERS,
             timeout=15
         )
         r.raise_for_status()
-        app = r.json().get(str(appid), {})
-        if not app.get('success'):
-            if not _debug_done:
-                print(f"  DEBUG [{appid}] success=False, app_keys={list(app.keys())}")
-                _debug_done = True
-            return 'U'
-        data = app.get('data') or {}
-        if not isinstance(data, dict):
-            if not _debug_done:
-                print(f"  DEBUG [{appid}] data is {type(data).__name__}")
-                _debug_done = True
-            return 'U'
+        data = r.json()
         if not _debug_done:
-            deck_val = data.get('steam_deck_compatibility')
-            deck_keys = [k for k in data.keys() if 'deck' in k.lower() or 'compat' in k.lower()]
-            print(f"  DEBUG [{appid}] data_keys_count={len(data)} deck_val_type={type(deck_val).__name__} deck_related_keys={deck_keys}")
+            print(f"  DEBUG [{appid}] status={r.status_code} keys={list(data.keys())[:8]}")
             _debug_done = True
-        deck = data.get('steam_deck_compatibility') or {}
-        if isinstance(deck, list):
-            deck = deck[0] if deck else {}
-        if not isinstance(deck, dict):
+        results = data.get('results') or {}
+        if not isinstance(results, dict):
             return 'U'
-        category = deck.get('category', 0)
+        category = int(results.get('resolved_category', 0))
         return DECK_MAP.get(category, 'U')
     except Exception as e:
         print(f"  Błąd API dla {appid}: {e}")
