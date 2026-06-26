@@ -106,7 +106,13 @@ def parse_rows(html, tag_map):
 
         # data wydania
         released_el = a.select_one(".search_released")
-        release_date = released_el.get_text(strip=True) if released_el else ""
+        release_date = ""
+        if released_el:
+            try:
+                release_date = time.strftime("%d.%m.%Y",
+                    time.strptime(released_el.get_text(strip=True), "%d %b, %Y"))
+            except ValueError:
+                release_date = released_el.get_text(strip=True)
 
         # opinie
         rev_el = a.select_one(".search_review_summary[data-tooltip-html]")
@@ -188,7 +194,7 @@ def write_to_sheet(rows):
     cest = dt.timezone(dt.timedelta(hours=2))
     stamp = dt.datetime.now(tz=cest).strftime("%Y-%m-%d %H:%M CEST")
     header = ["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "Link",
-              "Tagi", "Data wydania", "Opinie", "% pozytywnych", "AppID"]
+              "Tagi", "Released", "Opinie", "% pozytywnych", "AppID"]
     sheet_rows = [
         [f"Ostatnia aktualizacja: {stamp} | prog: {MIN_DISCOUNT}% | region: {CC}",
          "", "", "", "", "", "", "", "", ""],
@@ -237,6 +243,11 @@ def write_to_sheet(rows):
             "properties": {"pixelSize": 55},
             "fields": "pixelSize",
         }},
+        {"updateDimensionProperties": {
+            "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 6, "endIndex": 7},
+            "properties": {"pixelSize": 96},
+            "fields": "pixelSize",
+        }},
         {"autoResizeDimensions": {"dimensions": {
             "sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 5, "endIndex": 6
         }}} if max((len(str(r[5])) for r in rows), default=0) <= 80 else
@@ -280,7 +291,7 @@ def write_csv(rows):
     with open("steam_specials.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["Nazwa", "Znizka %", "Cena", "Cena pierwotna", "Link",
-                    "Tagi", "Data wydania", "Opinie", "% pozytywnych", "AppID"])
+                    "Tagi", "Released", "Opinie", "% pozytywnych", "AppID"])
         w.writerows(rows)
     print(f"Tryb lokalny: zapisano {len(rows)} gier -> steam_specials.csv")
 
