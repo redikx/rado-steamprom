@@ -1,4 +1,4 @@
-name: Steam specials scraper
+name: Steam promocje gry scraper
 
 on:
   schedule:
