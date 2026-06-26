@@ -37,7 +37,11 @@ def get_deck(appid):
         app = r.json().get(str(appid), {})
         if not app.get('success'):
             return 'U'
-        category = app.get('data', {}).get('steam_deck_compatibility', {}).get('category', 0)
+        deck = app.get('data', {}).get('steam_deck_compatibility', {})
+        # API zwraca listę lub dict w zależności od gry
+        if isinstance(deck, list):
+            deck = deck[0] if deck else {}
+        category = deck.get('category', 0)
         return DECK_MAP.get(category, 'U')
     except Exception as e:
         print(f"  Błąd API dla {appid}: {e}")
