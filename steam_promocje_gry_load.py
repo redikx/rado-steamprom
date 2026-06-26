@@ -212,10 +212,10 @@ def write_to_sheet(rows):
         }},
         {"autoResizeDimensions": {"dimensions": {
             "sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 0, "endIndex": 1
-        }}} if max((len(str(r[0])) for r in rows), default=0) <= 50 else
+        }}} if max((len(str(r[0])) for r in rows), default=0) <= 40 else
         {"updateDimensionProperties": {
             "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 0, "endIndex": 1},
-            "properties": {"pixelSize": 370},
+            "properties": {"pixelSize": 296},
             "fields": "pixelSize",
         }},
         {"repeatCell": {
@@ -255,10 +255,10 @@ def write_to_sheet(rows):
         }},
         {"autoResizeDimensions": {"dimensions": {
             "sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 5, "endIndex": 6
-        }}} if max((len(str(r[5])) for r in rows), default=0) <= 70 else
+        }}} if max((len(str(r[5])) for r in rows), default=0) <= 55 else
         {"updateDimensionProperties": {
             "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 5, "endIndex": 6},
-            "properties": {"pixelSize": 510},
+            "properties": {"pixelSize": 405},
             "fields": "pixelSize",
         }},
         {"repeatCell": {
