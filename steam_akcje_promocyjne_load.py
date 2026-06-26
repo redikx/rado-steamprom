@@ -118,7 +118,7 @@ def scrape():
         rows.append([name, to_local_iso(end_unix), end_unix, build_link(e)])
 
     rows.sort(key=lambda r: (r[2] == 0, r[2]))
-    return rows
+    return [[r[0], r[1], r[3]] for r in rows]
 
 
 def write_to_sheet(rows):
@@ -136,8 +136,8 @@ def write_to_sheet(rows):
 
     cest = dt.timezone(dt.timedelta(hours=2))
     stamp = dt.datetime.now(tz=cest).strftime("%Y-%m-%d %H:%M CEST")
-    header = ["Nazwa kampanii", "Czas zakonczenia", "Koniec (unix)", "Link"]
-    data = [[f"Ostatnia aktualizacja: {stamp}", "", "", ""], header] + rows
+    header = ["Nazwa kampanii", "Czas zakonczenia", "Link"]
+    data = [[f"Ostatnia aktualizacja: {stamp}", "", ""], header] + rows
 
     ws.clear()
     ws.update(values=data, range_name="A1")
@@ -147,7 +147,7 @@ def write_to_sheet(rows):
 def write_csv(rows):
     with open("steam_sales.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["Nazwa kampanii", "Czas zakonczenia", "Koniec (unix)", "Link"])
+        w.writerow(["Nazwa kampanii", "Czas zakonczenia", "Link"])
         w.writerows(rows)
     print(f"Tryb lokalny: zapisano {len(rows)} kampanii -> steam_sales.csv")
 
