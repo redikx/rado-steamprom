@@ -118,7 +118,7 @@ def scrape():
         rows.append([name, to_local_iso(end_unix), end_unix, build_link(e)])
 
     rows.sort(key=lambda r: (r[2] == 0, r[2]))
-    return [[r[0], r[1], r[3]] for r in rows]
+    return [[r[0], r[1], f'=HYPERLINK("{r[3]}","Link")' if r[3] else ""] for r in rows]
 
 
 def write_to_sheet(rows):
@@ -140,15 +140,26 @@ def write_to_sheet(rows):
     data = [[f"Ostatnia aktualizacja: {stamp}", "", ""], header] + rows
 
     ws.clear()
-    ws.update(values=data, range_name="A1")
+    ws.update(values=data, range_name="A1", value_input_option="USER_ENTERED")
 
     max_len = max((len(r[0]) for r in rows if r), default=20)
     col_a_px = min(max_len, 50) * 7 + 20
+    col_c_px = 8 * 7 + 20
     sh.batch_update({"requests": [
         {"updateDimensionProperties": {
             "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 0, "endIndex": 1},
             "properties": {"pixelSize": col_a_px},
             "fields": "pixelSize"
+        }},
+        {"updateDimensionProperties": {
+            "range": {"sheetId": ws.id, "dimension": "COLUMNS", "startIndex": 2, "endIndex": 3},
+            "properties": {"pixelSize": col_c_px},
+            "fields": "pixelSize"
+        }},
+        {"repeatCell": {
+            "range": {"sheetId": ws.id, "startColumnIndex": 2, "endColumnIndex": 3},
+            "cell": {"userEnteredFormat": {"horizontalAlignment": "CENTER"}},
+            "fields": "userEnteredFormat.horizontalAlignment"
         }}
     ]})
 
