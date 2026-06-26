@@ -53,11 +53,12 @@ n_count = 0
 for i, row in enumerate(data_rows):
     if not row or len(row) <= appid_promo_col:
         continue
-    appid = row[appid_promo_col].strip()
-    if not appid:
+    appid_raw = row[appid_promo_col].strip()
+    if not appid_raw:
         continue
 
-    value = 'Y' if appid in library_appids else 'N'
+    appids = [a.strip() for a in appid_raw.split(',')]
+    value = 'Y' if any(a in library_appids for a in appids) else 'N'
     batch_updates.append({
         'range': gspread.utils.rowcol_to_a1(data_start_row + i, lib_col_idx),
         'values': [[value]]
