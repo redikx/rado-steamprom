@@ -160,6 +160,14 @@ def write_to_sheet(rows):
             "range": {"sheetId": ws.id, "startColumnIndex": 2, "endColumnIndex": 3},
             "cell": {"userEnteredFormat": {"horizontalAlignment": "CENTER"}},
             "fields": "userEnteredFormat.horizontalAlignment"
+        }},
+        {"repeatCell": {
+            "range": {"sheetId": ws.id, "startRowIndex": 1, "endRowIndex": 2},
+            "cell": {"userEnteredFormat": {
+                "textFormat": {"bold": True},
+                "horizontalAlignment": "CENTER"
+            }},
+            "fields": "userEnteredFormat.textFormat.bold,userEnteredFormat.horizontalAlignment"
         }}
     ]})
 
