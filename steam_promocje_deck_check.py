@@ -40,7 +40,7 @@ def get_deck(appid):
         r.raise_for_status()
         data = r.json()
         if not _debug_done:
-            print(f"  DEBUG [{appid}] status={r.status_code} keys={list(data.keys())[:8]}")
+            print(f"  DEBUG [{appid}] status={r.status_code} success={data.get('success')} results={data.get('results')}")
             _debug_done = True
         results = data.get('results') or {}
         if not isinstance(results, dict):
