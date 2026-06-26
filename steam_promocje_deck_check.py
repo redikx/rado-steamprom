@@ -25,11 +25,14 @@ creds = Credentials.from_service_account_info(
 gc = gspread.authorize(creds)
 
 
+_debug_done = False
+
 def get_deck(appid):
+    global _debug_done
     try:
         r = requests.get(
             "https://store.steampowered.com/api/appdetails",
-            params={"appids": appid, "filters": "steam_deck_compatibility", "l": "english"},
+            params={"appids": appid, "l": "english"},
             headers=HEADERS,
             timeout=15
         )
@@ -37,10 +40,17 @@ def get_deck(appid):
         app = r.json().get(str(appid), {})
         if not app.get('success'):
             return 'U'
-        deck = app.get('data', {}).get('steam_deck_compatibility', {})
-        # API zwraca listę lub dict w zależności od gry
+        data = app.get('data') or {}
+        if not isinstance(data, dict):
+            return 'U'
+        deck = data.get('steam_deck_compatibility') or {}
         if isinstance(deck, list):
             deck = deck[0] if deck else {}
+        if not isinstance(deck, dict):
+            return 'U'
+        if not _debug_done:
+            print(f"  DEBUG deck fields: {deck}")
+            _debug_done = True
         category = deck.get('category', 0)
         return DECK_MAP.get(category, 'U')
     except Exception as e:
