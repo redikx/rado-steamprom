@@ -1,0 +1,28 @@
+name: "Checker: Promocje vs Biblioteka"
+
+on:
+  workflow_run:
+    workflows: ["Steam promocje gry scraper"]
+    types:
+      - completed
+
+jobs:
+  check:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install gspread google-auth
+
+      - name: "Sprawdź IF_IN_LIBRARY w Steam-promocje"
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          SHEET_ID_PROMOCJE: "1NHKBx5nAoUnfuNk3PNXJKhoaCtcrQqwFHdGN4kHT0Wk"
+          SHEET_ID_LIBRARY: "1kP_2TrXq34vfMdKLstEgBbmBlnXidRTKFwOIoWrBiaY"
+        run: python steam_promocje_check_library.py
