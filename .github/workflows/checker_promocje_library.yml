@@ -1,8 +1,8 @@
-name: "Checker: Promocje vs Biblioteka"
+name: "Promocje enrichment"
 
 on:
   workflow_run:
-    workflows: ["Steam promocje gry scraper"]
+    workflows: ["Steam gry scraper"]
     types:
       - completed
 

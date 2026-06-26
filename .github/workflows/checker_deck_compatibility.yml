@@ -2,7 +2,7 @@ name: "Checker: Steam Deck compatibility"
 
 on:
   workflow_run:
-    workflows: ["Checker: Promocje vs Biblioteka"]
+    workflows: ["Promocje enrichment"]
     types:
       - completed
 
