@@ -58,6 +58,9 @@ wish_ws = wish_wb.sheet1
 wish_data = wish_ws.get_all_values()
 
 szukane_header = wish_data[0]
+if 'AppID' not in szukane_header:
+    print("BŁĄD: brak kolumny 'AppID' w arkuszu Wishlist.")
+    exit(1)
 appid_wish_col_0 = szukane_header.index('AppID')  # 0-indexed
 deck_wish_col_1  = appid_wish_col_0 + 2            # 1-indexed (następna kolumna)
 
@@ -85,11 +88,19 @@ promo_wb = gc.open_by_key(SHEET_ID_PROMOCJE)
 promo_ws = promo_wb.sheet1
 promo_data = promo_ws.get_all_values()
 
-header_row_idx = next(i for i, row in enumerate(promo_data) if 'AppID' in row)
+try:
+    header_row_idx = next(i for i, row in enumerate(promo_data) if 'AppID' in row)
+except StopIteration:
+    print("BŁĄD: nie znaleziono nagłówka 'AppID' w arkuszu Steam-promocje.")
+    exit(1)
 promo_header   = promo_data[header_row_idx]
 data_rows      = promo_data[header_row_idx + 1:]
 data_start_row = header_row_idx + 2  # 1-indexed
 
+for col_name in ('AppID', 'Znizka %', 'HAVE'):
+    if col_name not in promo_header:
+        print(f"BŁĄD: brak kolumny '{col_name}' w nagłówku Steam-promocje.")
+        exit(1)
 appid_col  = promo_header.index('AppID')
 znizka_col = promo_header.index('Znizka %')
 have_col   = promo_header.index('HAVE')

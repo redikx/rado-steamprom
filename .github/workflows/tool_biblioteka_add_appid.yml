@@ -14,12 +14,12 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install requests gspread google-auth
+        run: pip install -r requirements.txt
 
       - name: Dodaj AppID do arkusza Moja biblioteka steam
         env:
           STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
           STEAM_ID: ${{ secrets.STEAM_ID }}
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-          SHEET_ID_LIBRARY: "1kP_2TrXq34vfMdKLstEgBbmBlnXidRTKFwOIoWrBiaY"
+          SHEET_ID_LIBRARY: ${{ secrets.SHEET_ID_LIBRARY }}
         run: python steam_biblioteka_enrichment_appid.py

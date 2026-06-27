@@ -152,7 +152,9 @@ def fetch_specials(tag_map):
         for attempt in range(5):
             r = session.get(SEARCH_URL, params=params, timeout=30)
             if r.status_code in (429, 502, 503, 504):
-                wait = 10 * (2 ** attempt)
+                retry_after = r.headers.get("Retry-After")
+                wait = int(retry_after) if retry_after and retry_after.isdigit() \
+                    else 10 * (2 ** attempt)
                 print(f"[retry] {r.status_code}, czekam {wait}s (proba {attempt+1}/5)...")
                 time.sleep(wait)
                 continue

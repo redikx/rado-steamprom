@@ -18,11 +18,11 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install gspread google-auth requests
+        run: pip install -r requirements.txt
 
       - name: "Sprawdź Steam Deck compatibility"
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-          SHEET_ID_PROMOCJE: "1NHKBx5nAoUnfuNk3PNXJKhoaCtcrQqwFHdGN4kHT0Wk"
-          SHEET_ID_WISHLIST: "1CWHtGUf7Zeg0LVel-lkwEKf9V10czQuYIQ9BKeNt16A"
+          SHEET_ID_PROMOCJE: ${{ secrets.SHEET_ID_PROMOCJE }}
+          SHEET_ID_WISHLIST: ${{ secrets.SHEET_ID_WISHLIST }}
         run: python steam_promocje_deck_check.py

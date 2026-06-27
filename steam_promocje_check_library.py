@@ -30,11 +30,18 @@ print(f"Biblioteka: {len(library_appids)} gier z AppID.")
 promo_sheet = gc.open_by_key(SHEET_ID_PROMOCJE).sheet1
 promo_data = promo_sheet.get_all_values()
 
-header_row_idx = next(i for i, row in enumerate(promo_data) if 'AppID' in row)
+try:
+    header_row_idx = next(i for i, row in enumerate(promo_data) if 'AppID' in row)
+except StopIteration:
+    print("BŁĄD: nie znaleziono nagłówka 'AppID' w arkuszu Steam-promocje.")
+    exit(1)
 promo_header = promo_data[header_row_idx]
 data_rows = promo_data[header_row_idx + 1:]
 data_start_row = header_row_idx + 2  # 1-indexed w arkuszu
 
+if 'AppID' not in promo_header:
+    print("BŁĄD: brak kolumny 'AppID' w nagłówku Steam-promocje.")
+    exit(1)
 appid_promo_col = promo_header.index('AppID')
 
 # znajdź lub utwórz kolumnę HAVE
