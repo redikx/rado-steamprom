@@ -1,8 +1,8 @@
-name: "Promocje enrichment"
+name: "1.1 Promocje enrichment"
 
 on:
   workflow_run:
-    workflows: ["Steam gry scraper"]
+    workflows: ["1 Steam gry scraper"]
     types:
       - completed
 

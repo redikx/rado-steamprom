@@ -1,8 +1,8 @@
-name: "Checker: Steam Deck compatibility"
+name: "1.1.1 Checker: Steam Deck compatibility"
 
 on:
   workflow_run:
-    workflows: ["Promocje enrichment"]
+    workflows: ["1.1 Promocje enrichment"]
     types:
       - completed
 

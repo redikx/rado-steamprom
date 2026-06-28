@@ -1,8 +1,8 @@
-name: "Dopasowanie: enrichment tagów"
+name: "1.2 Dopasowanie: enrichment tagów"
 
 on:
   workflow_run:
-    workflows: ["Steam gry scraper"]
+    workflows: ["1 Steam gry scraper"]
     types:
       - completed
   workflow_dispatch: {}

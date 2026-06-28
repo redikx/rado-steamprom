@@ -1,8 +1,8 @@
-name: "Stats: tagi Dopasowanie"
+name: "1.2.1 Stats: tagi Dopasowanie"
 
 on:
   workflow_run:
-    workflows: ["Dopasowanie: enrichment tagów"]
+    workflows: ["1.2 Dopasowanie: enrichment tagów"]
     types:
       - completed
   workflow_dispatch: {}
