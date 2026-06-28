@@ -55,6 +55,8 @@ if "Tagi" not in header:
     print("BŁĄD: brak kolumny 'Tagi' w nagłówku steam-promocje.")
     exit(1)
 tagi_col = header.index("Tagi")
+have_col = header.index("HAVE") if "HAVE" in header else None
+deck_col = header.index("DECK") if "DECK" in header else None
 
 # Znajdź lub utwórz kolumnę Score
 if "Score" in header:
@@ -85,7 +87,10 @@ for i, row in enumerate(data_rows):
         "range": gspread.utils.rowcol_to_a1(data_start + i, score_col_1),
         "values": [[score]],
     })
-    if score > 1:
+    have = row[have_col].strip() if have_col is not None and len(row) > have_col else "N"
+    deck = row[deck_col].strip() if deck_col is not None and len(row) > deck_col else ""
+    recommended = score > 1 and have == "N" and deck != "N"
+    if recommended:
         bold_rows.append(header_row_idx + 1 + i)  # 0-indexed sheet row
         scored += 1
     else:
