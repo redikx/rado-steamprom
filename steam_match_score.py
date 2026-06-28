@@ -118,25 +118,40 @@ format_requests = [
     }},
 ]
 
-# Bold dla wierszy z score > 0
+# Kolumna Link (E) wykluczona z boldowania — żeby nie nadpisywać stylu hyperlinku
+link_col = header.index("Link") if "Link" in header else None
+
+# Bold dla wierszy z score > 1 (dwa zakresy: przed i po kolumnie Link)
 for row_0 in bold_rows:
-    format_requests.append({"repeatCell": {
-        "range": {"sheetId": promo_ws.id,
-                  "startRowIndex": row_0, "endRowIndex": row_0 + 1,
-                  "startColumnIndex": 0, "endColumnIndex": score_col_1},
-        "cell": {"userEnteredFormat": {"textFormat": {"bold": True}}},
-        "fields": "userEnteredFormat(textFormat)",
-    }})
+    for col_start, col_end in (
+        [(0, link_col), (link_col + 1, score_col_1)] if link_col is not None
+        else [(0, score_col_1)]
+    ):
+        if col_start >= col_end:
+            continue
+        format_requests.append({"repeatCell": {
+            "range": {"sheetId": promo_ws.id,
+                      "startRowIndex": row_0, "endRowIndex": row_0 + 1,
+                      "startColumnIndex": col_start, "endColumnIndex": col_end},
+            "cell": {"userEnteredFormat": {"textFormat": {"bold": True}}},
+            "fields": "userEnteredFormat(textFormat)",
+        }})
 
 # Usuń bold dla wierszy bez dopasowania (reset po poprzednim runie)
 for row_0 in nonbold_rows:
-    format_requests.append({"repeatCell": {
-        "range": {"sheetId": promo_ws.id,
-                  "startRowIndex": row_0, "endRowIndex": row_0 + 1,
-                  "startColumnIndex": 0, "endColumnIndex": score_col_1},
-        "cell": {"userEnteredFormat": {"textFormat": {"bold": False}}},
-        "fields": "userEnteredFormat(textFormat)",
-    }})
+    for col_start, col_end in (
+        [(0, link_col), (link_col + 1, score_col_1)] if link_col is not None
+        else [(0, score_col_1)]
+    ):
+        if col_start >= col_end:
+            continue
+        format_requests.append({"repeatCell": {
+            "range": {"sheetId": promo_ws.id,
+                      "startRowIndex": row_0, "endRowIndex": row_0 + 1,
+                      "startColumnIndex": col_start, "endColumnIndex": col_end},
+            "cell": {"userEnteredFormat": {"textFormat": {"bold": False}}},
+            "fields": "userEnteredFormat(textFormat)",
+        }})
 
 promo_wb.batch_update({"requests": format_requests})
 
