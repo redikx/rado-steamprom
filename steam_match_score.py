@@ -84,7 +84,7 @@ for i, row in enumerate(data_rows):
         "range": gspread.utils.rowcol_to_a1(data_start + i, score_col_1),
         "values": [[score]],
     })
-    if score > 0:
+    if score > 1:
         bold_rows.append(header_row_idx + 1 + i)  # 0-indexed sheet row
         scored += 1
     else:
