@@ -1,0 +1,29 @@
+name: "Stats: match score promocje"
+
+on:
+  workflow_run:
+    workflows: ["Stats: tagi Dopasowanie"]
+    types:
+      - completed
+  workflow_dispatch: {}
+
+jobs:
+  score:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Calculate match scores
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          SHEET_ID_WISHLIST: ${{ secrets.SHEET_ID_WISHLIST }}
+          SHEET_ID_PROMOCJE: ${{ secrets.SHEET_ID_PROMOCJE }}
+        run: python steam_match_score.py
