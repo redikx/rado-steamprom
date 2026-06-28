@@ -89,7 +89,9 @@ for i, row in enumerate(data_rows):
     })
     have = row[have_col].strip() if have_col is not None and len(row) > have_col else "N"
     deck = row[deck_col].strip() if deck_col is not None and len(row) > deck_col else ""
-    recommended = score > 1 and have == "N" and deck != "N"
+    tags_lower = [t.strip().lower() for t in tags_raw.split(",") if t.strip()]
+    excluded = "pixel graphics" in tags_lower
+    recommended = score > 1 and have == "N" and deck != "N" and not excluded
     if recommended:
         bold_rows.append(header_row_idx + 1 + i)  # 0-indexed sheet row
         scored += 1
