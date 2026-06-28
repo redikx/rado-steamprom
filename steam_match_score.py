@@ -133,4 +133,4 @@ for row_0 in nonbold_rows:
 
 promo_wb.batch_update({"requests": format_requests})
 
-print(f"Score zapisane: {scored} gier z dopasowaniem > 0 (łącznie {len(updates)} wierszy).")
+print(f"Score zapisane: {scored} gier z dopasowaniem > 1 (łącznie {len(score_updates)} wierszy).")
