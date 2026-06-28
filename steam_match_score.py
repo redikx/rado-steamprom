@@ -61,6 +61,7 @@ if "Score" in header:
     score_col_1 = header.index("Score") + 1
 else:
     score_col_1 = len(header) + 1
+    promo_ws.resize(cols=score_col_1)
     promo_ws.update_cell(header_row_idx + 1, score_col_1, "Score")
 
 # ── Oblicz score wiersz po wierszu ────────────────────────────────────────
