@@ -2,7 +2,7 @@ name: "Stats: match score promocje"
 
 on:
   workflow_run:
-    workflows: ["Stats: tagi Dopasowanie"]
+    workflows: ["Checker: Steam Deck compatibility"]
     types:
       - completed
   workflow_dispatch: {}
